@@ -1,0 +1,136 @@
+\chapter{Análise e Arquitetura do Sistema}
+\label{chap:arquitetura}
+
+\section{Introdução}
+\label{chap3:sec:intro}
+
+Este capítulo descreve como o problema foi decomposto e traduzido para uma arquitetura simples, mas organizada. A implementação foi pensada para ser fácil de explicar numa defesa oral: existe uma classe central (\texttt{Game}) que controla estado, objetos e renderização; e classes pequenas para representar entidades do jogo (bola, raquete e blocos).
+
+\section{Requisitos}
+\label{chap3:sec:req}
+
+A Tabela~\ref{tab:req} resume os requisitos definidos para o projeto.
+
+\begin{table}[H]
+\centering
+\caption{Requisitos principais do projeto.}
+\label{tab:req}
+\begin{tabular}{p{2.2cm} p{11cm}}
+\hline
+\textbf{Tipo} & \textbf{Requisitos} \\
+\hline
+Funcionais &
+(i) mover a raquete para esquerda/direita; 
+(ii) atualizar bola com \textit{delta time};
+(iii) colisões com paredes, raquete e blocos; 
+(iv) destruir blocos e atualizar pontuação; 
+(v) detetar vitória/derrota e permitir \textit{reset}. \\
+\hline
+Não funcionais &
+(i) manter \ac{FPS} estável (sem cálculos pesados por frame);
+(ii) código modular e legível;
+(iii) uso do perfil \ac{OpenGL} 3.3 core e shaders em \ac{GLSL}. \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Estrutura de Classes}
+\label{chap3:sec:classes}
+
+O diagrama da Figura~\ref{fig:classes} mostra a organização em alto nível. A classe \texttt{Game} é responsável por:
+\begin{itemize}
+  \item Criar e inicializar os objetos do jogo;
+  \item Gerir o input (\texttt{keys[1024]});
+  \item Atualizar o estado a cada frame (\texttt{update(dt)});
+  \item Desenhar a cena (\texttt{render()}).
+\end{itemize}
+
+As restantes classes são deliberadamente pequenas e com poucas responsabilidades: a bola sabe atualizar a sua posição e inverter componentes de velocidade; a raquete sabe mover-se respeitando limites; cada bloco sabe apenas se está destruído.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{fig_classes_v4.pdf}
+\caption{Visão geral das principais classes e relações (diagrama limpo).}
+\label{fig:classes}
+\end{figure}
+
+\section{Ciclo Principal do Jogo}
+\label{chap3:sec:loop}
+
+O programa principal (em \texttt{main.cpp}) segue um ciclo típico de aplicações gráficas com \ac{GLFW}:
+\begin{enumerate}
+  \item calcular \texttt{deltaTime};
+  \item processar input;
+  \item atualizar estado;
+  \item renderizar;
+  \item trocar buffers e processar eventos.
+\end{enumerate}
+
+A Figura~\ref{fig:loop} sintetiza o fluxo por frame.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{fig_game_loop_v4.pdf}
+\caption{Ciclo principal executado em cada frame (com base no \texttt{main.cpp}).}
+\label{fig:loop}
+\end{figure}
+
+Uma nota importante: o uso de \texttt{deltaTime} garante que a velocidade percebida se mantém aproximadamente constante, mesmo que a \ac{FPS} varie. Sem isto, o jogo ficaria mais rápido em máquinas mais potentes, o que é indesejável.
+
+\section{Estados de Jogo e Regras}
+\label{chap3:sec:estado}
+
+A enumeração \texttt{GameState} define quatro estados: \texttt{GAME\_ACTIVE}, \texttt{GAME\_MENU}, \texttt{GAME\_WIN}, \texttt{GAME\_LOSE}. Nesta versão, o jogo inicia em \texttt{GAME\_ACTIVE} e muda para:
+\begin{itemize}
+  \item \textbf{Derrota} quando a bola passa a linha inferior (limite em $y=-10$);
+  \item \textbf{Vitória} quando todos os blocos foram destruídos.
+\end{itemize}
+
+O estado \texttt{GAME\_MENU} está previsto na estrutura mas não é explorado (fica como ponto de extensão para trabalho futuro).
+
+\section{Configuração do Mundo e Parâmetros}
+\label{chap3:sec:param}
+
+A lógica do jogo vive num ``mundo'' com limites simples, alinhados aos eixos (o que torna as colisões mais diretas). A Tabela~\ref{tab:param} agrega os parâmetros mais relevantes, extraídos diretamente do código.
+
+\begin{table}[H]
+\centering
+\caption{Parâmetros principais do jogo (valores no código).}
+\label{tab:param}
+\begin{tabular}{p{5.0cm} p{3.5cm} p{4.5cm}}
+\hline
+\textbf{Parâmetro} & \textbf{Valor} & \textbf{Onde é usado} \\
+\hline
+Resolução & $1920\times1080$ & janela \ac{GLFW} (\texttt{main.cpp}) \\
+Limites laterais & $x \in [-15,15]$ & paredes e limites da raquete/bola \\
+Limite superior & $y=10$ & colisão da bola com ``teto'' \\
+Linha de derrota & $y=-10$ & transição para \texttt{GAME\_LOSE} \\
+Posição inicial da bola & $(0,-5,0)$ & inicialização e reset \\
+Raquete: posição & $(0,-8,0)$ & início e reset \\
+Raquete: tamanho & $(3,0.5,1)$ & escala do cubo \\
+Raquete: velocidade & $20$ & movimento em $x$ \\
+Bola: raio & $0.5$ & desenho e colisões \\
+Grelha de blocos & $5\times10$ & \texttt{createBricks()} \\
+Bloco: tamanho & $(2,1,1)$ & escala do cubo \\
+Espaçamento entre blocos & $0.2$ & distribuição da grelha \\
+Pontuação por bloco & $+10$ & destruição de blocos \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Controlos}
+\label{chap3:sec:controls}
+
+Os controlos são mapeados para duas teclas equivalentes em cada direção (A ou seta esquerda; D ou seta direita). Adicionalmente, existe uma tecla para reiniciar. Na prática, isto facilita testar em diferentes teclados e evita que o jogador dependa de um único esquema.
+
+\begin{itemize}
+  \item \textbf{A / $\leftarrow$}: mover raquete para a esquerda;
+  \item \textbf{D / $\rightarrow$}: mover raquete para a direita;
+  \item \textbf{R}: reiniciar o jogo;
+  \item \textbf{ESC}: sair.
+\end{itemize}
+
+\section{Conclusões}
+\label{chap3:sec:concs}
+
+A arquitetura escolhida é intencionalmente simples, mas deixa espaço para evoluções (menu, níveis, diferentes tipos de blocos, etc.). No capítulo seguinte (Capítulo~\ref{chap:implementacao}) detalham-se as partes mais críticas da implementação: geração de geometria (cubo e esfera), shaders, colisões e desenho de todos os elementos em cena.

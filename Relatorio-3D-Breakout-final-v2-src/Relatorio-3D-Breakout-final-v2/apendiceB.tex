@@ -1,0 +1,81 @@
+\chapter{Compilação, Execução e Estrutura}
+\label{ap:B}
+
+\section{Dependências}
+
+Para compilar o projeto são necessárias as seguintes dependências:
+
+\begin{itemize}
+  \item Compilador com suporte a C++17 (ex.: \texttt{g++}).
+  \item Bibliotecas: \ac{GLFW}, \ac{GLEW}, \ac{OpenGL} e \ac{GLM}.
+\end{itemize}
+
+\section{Compilação e Execução (Windows)}
+
+O \texttt{Makefile} fornecido está orientado para Windows, usando \texttt{g++} (por exemplo, via MinGW) e ligando com:
+
+\begin{itemize}
+  \item \texttt{-lglfw3}
+  \item \texttt{-lglew32}
+  \item \texttt{-lopengl32}
+  \item \texttt{-lgdi32}
+\end{itemize}
+
+Com as dependências instaladas, basta executar:
+
+\begin{lstlisting}[caption={Compilar e executar.},label={lst:buildrun}]
+make
+make run
+\end{lstlisting}
+
+Para limpar ficheiros intermédios:
+
+\begin{lstlisting}[caption={Limpar build.},label={lst:clean}]
+make clean
+\end{lstlisting}
+
+\section{Compilação (Linux/macOS)}
+
+Em Linux, tipicamente substitui-se o conjunto de bibliotecas por algo do género:
+
+\begin{itemize}
+  \item \texttt{-lglfw -lGLEW -lGL}
+\end{itemize}
+
+Em macOS (via Homebrew), poderá ser necessário ajustar caminhos de includes e libs e usar \texttt{-framework OpenGL}. Como isto depende bastante da máquina, a recomendação é manter o código igual e apenas adaptar os \textit{flags} de ligação.
+
+\section{Estrutura de Ficheiros}
+
+\begin{lstlisting}[caption={Estrutura do projeto (simplificada).},label={lst:tree}]
+3D-Breakout/
+  include/
+    ball.h  brick.h  game.h  paddle.h  renderer.h  shader.h
+  src/
+    ball.cpp brick.cpp game.cpp main.cpp paddle.cpp renderer.cpp shader.cpp
+  shaders/
+    vertex.vert fragment.frag
+  Makefile
+\end{lstlisting}
+
+\section{Notas de Depuração}
+
+Durante o desenvolvimento, foi útil:
+\begin{itemize}
+  \item imprimir o estado e pontuação na consola (vitória/derrota);
+  \item reduzir temporariamente a velocidade da bola para observar colisões;
+  \item desenhar paredes/limites para perceber melhor a área de jogo.
+\end{itemize}
+
+\section{Compilação do Relatório (\LaTeX)}
+
+Para compilar este relatório (incluindo a bibliografia), recomenda-se a sequência:
+
+\begin{lstlisting}[caption={Compilação do relatório em \LaTeX.},label={lst:buildreport}]
+pdflatex relatorio-projeto.tex
+biber relatorio-projeto
+pdflatex relatorio-projeto.tex
+pdflatex relatorio-projeto.tex
+\end{lstlisting}
+
+Esta repetição é normal: garante que o índice, a lista de figuras/tabelas e as referências cruzadas ficam preenchidas.
+

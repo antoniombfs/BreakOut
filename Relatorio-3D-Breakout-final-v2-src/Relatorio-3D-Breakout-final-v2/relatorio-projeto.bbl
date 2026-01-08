@@ -1,0 +1,222 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{breakoutAtari}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=ac8fe873bc90b3779dd13935dd6f29f2}{%
+           family={{Atari}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{ac8fe873bc90b3779dd13935dd6f29f2}
+      \strng{fullhash}{ac8fe873bc90b3779dd13935dd6f29f2}
+      \strng{bibnamehash}{ac8fe873bc90b3779dd13935dd6f29f2}
+      \strng{authorbibnamehash}{ac8fe873bc90b3779dd13935dd6f29f2}
+      \strng{authornamehash}{ac8fe873bc90b3779dd13935dd6f29f2}
+      \strng{authorfullhash}{ac8fe873bc90b3779dd13935dd6f29f2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Informação histórica e descrição do jogo. Disponível em: \url{https://www.atari.com/}. Último acesso: Janeiro 2026}
+      \field{title}{Breakout (1976)}
+      \field{year}{1976}
+    \endentry
+    \entry{openglSpec}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=364378d45b69f33fd50d5d62ae518626}{%
+           family={{Khronos Group}},
+           familyi={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{fullhash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{bibnamehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{authorbibnamehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{authornamehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{authorfullhash}{364378d45b69f33fd50d5d62ae518626}
+      \field{extraname}{1}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Disponível em: \url{https://www.khronos.org/registry/OpenGL/specs/gl/glspec33.core.pdf}. Último acesso: Janeiro 2026}
+      \field{title}{{OpenGL} 3.3 Core Profile Specification}
+      \field{year}{2010}
+    \endentry
+    \entry{glslSpec}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=364378d45b69f33fd50d5d62ae518626}{%
+           family={{Khronos Group}},
+           familyi={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{fullhash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{bibnamehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{authorbibnamehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{authornamehash}{364378d45b69f33fd50d5d62ae518626}
+      \strng{authorfullhash}{364378d45b69f33fd50d5d62ae518626}
+      \field{extraname}{2}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Disponível em: \url{https://www.khronos.org/registry/OpenGL/specs/gl/GLSLangSpec.3.30.pdf}. Último acesso: Janeiro 2026}
+      \field{title}{{OpenGL Shading Language} 3.30 Specification}
+      \field{year}{2010}
+    \endentry
+    \entry{glfw}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=049eaa1957a58c67768fba6dfa12472e}{%
+           family={{GLFW Developers}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{049eaa1957a58c67768fba6dfa12472e}
+      \strng{fullhash}{049eaa1957a58c67768fba6dfa12472e}
+      \strng{bibnamehash}{049eaa1957a58c67768fba6dfa12472e}
+      \strng{authorbibnamehash}{049eaa1957a58c67768fba6dfa12472e}
+      \strng{authornamehash}{049eaa1957a58c67768fba6dfa12472e}
+      \strng{authorfullhash}{049eaa1957a58c67768fba6dfa12472e}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Disponível em: \url{https://www.glfw.org/documentation.html}. Último acesso: Janeiro 2026}
+      \field{title}{{GLFW} Documentation}
+      \field{year}{2025}
+    \endentry
+    \entry{glew}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=f9a4617e7f642da1fed92f56e09cf4df}{%
+           family={{GLEW Project}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{f9a4617e7f642da1fed92f56e09cf4df}
+      \strng{fullhash}{f9a4617e7f642da1fed92f56e09cf4df}
+      \strng{bibnamehash}{f9a4617e7f642da1fed92f56e09cf4df}
+      \strng{authorbibnamehash}{f9a4617e7f642da1fed92f56e09cf4df}
+      \strng{authornamehash}{f9a4617e7f642da1fed92f56e09cf4df}
+      \strng{authorfullhash}{f9a4617e7f642da1fed92f56e09cf4df}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Disponível em: \url{http://glew.sourceforge.net/}. Último acesso: Janeiro 2026}
+      \field{title}{{GLEW} --- The OpenGL Extension Wrangler Library}
+      \field{year}{2025}
+    \endentry
+    \entry{glm}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=05dd48f79ad8a34a68d7f2c1a3f52b09}{%
+           family={{G-Truc Creation}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{05dd48f79ad8a34a68d7f2c1a3f52b09}
+      \strng{fullhash}{05dd48f79ad8a34a68d7f2c1a3f52b09}
+      \strng{bibnamehash}{05dd48f79ad8a34a68d7f2c1a3f52b09}
+      \strng{authorbibnamehash}{05dd48f79ad8a34a68d7f2c1a3f52b09}
+      \strng{authornamehash}{05dd48f79ad8a34a68d7f2c1a3f52b09}
+      \strng{authorfullhash}{05dd48f79ad8a34a68d7f2c1a3f52b09}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Disponível em: \url{https://github.com/g-truc/glm}. Último acesso: Janeiro 2026}
+      \field{title}{{GLM} --- OpenGL Mathematics}
+      \field{year}{2025}
+    \endentry
+    \entry{realtimeRendering}{book}{}
+      \name{author}{3}{}{%
+        {{hash=f6061b73d9bdb8fceb556ed41cd144a6}{%
+           family={Akenine-Möller},
+           familyi={A\bibinithyphendelim M\bibinitperiod},
+           given={Tomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=f2cd5883c9757f88d9a81f92ee663907}{%
+           family={Haines},
+           familyi={H\bibinitperiod},
+           given={Eric},
+           giveni={E\bibinitperiod}}}%
+        {{hash=eed616961e0274036a96489be8cd147e}{%
+           family={Hoffman},
+           familyi={H\bibinitperiod},
+           given={Naty},
+           giveni={N\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {A K Peters/CRC Press}%
+      }
+      \strng{namehash}{dbfd5d60176b95f4ab27b0c00a1ff6fd}
+      \strng{fullhash}{dbfd5d60176b95f4ab27b0c00a1ff6fd}
+      \strng{bibnamehash}{dbfd5d60176b95f4ab27b0c00a1ff6fd}
+      \strng{authorbibnamehash}{dbfd5d60176b95f4ab27b0c00a1ff6fd}
+      \strng{authornamehash}{dbfd5d60176b95f4ab27b0c00a1ff6fd}
+      \strng{authorfullhash}{dbfd5d60176b95f4ab27b0c00a1ff6fd}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{4}
+      \field{title}{Real-Time Rendering}
+      \field{year}{2018}
+    \endentry
+    \entry{learnopengl}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=ef45c4816f625a8248882c38f9f25c85}{%
+           family={{LearnOpenGL}},
+           familyi={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{ef45c4816f625a8248882c38f9f25c85}
+      \strng{fullhash}{ef45c4816f625a8248882c38f9f25c85}
+      \strng{bibnamehash}{ef45c4816f625a8248882c38f9f25c85}
+      \strng{authorbibnamehash}{ef45c4816f625a8248882c38f9f25c85}
+      \strng{authornamehash}{ef45c4816f625a8248882c38f9f25c85}
+      \strng{authorfullhash}{ef45c4816f625a8248882c38f9f25c85}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Disponível em: \url{https://learnopengl.com/}. Último acesso: Janeiro 2026}
+      \field{title}{Lighting (Phong) and Shaders}
+      \field{year}{2025}
+    \endentry
+    \entry{doxygenManual}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=7f20b283fe8e6e7416c8090e0660c2fe}{%
+           family={{Doxygen}},
+           familyi={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{7f20b283fe8e6e7416c8090e0660c2fe}
+      \strng{fullhash}{7f20b283fe8e6e7416c8090e0660c2fe}
+      \strng{bibnamehash}{7f20b283fe8e6e7416c8090e0660c2fe}
+      \strng{authorbibnamehash}{7f20b283fe8e6e7416c8090e0660c2fe}
+      \strng{authornamehash}{7f20b283fe8e6e7416c8090e0660c2fe}
+      \strng{authorfullhash}{7f20b283fe8e6e7416c8090e0660c2fe}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{[Online]. Disponível em: \url{https://www.doxygen.nl/manual/}. Último acesso: Janeiro 2026}
+      \field{title}{Doxygen Manual}
+      \field{year}{2025}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

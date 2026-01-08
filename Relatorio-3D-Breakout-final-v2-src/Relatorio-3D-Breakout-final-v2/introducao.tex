@@ -1,0 +1,53 @@
+\chapter{Introdução}
+\label{chap:intro}
+
+\section{Enquadramento}
+\label{sec:enq}
+
+O jogo \emph{Breakout} é um clássico: uma bola, uma raquete (paddle) e um conjunto de blocos que devem ser destruídos com sucessivas colisões. Apesar de ser um problema simples do ponto de vista de regras, é um ótimo pretexto para aplicar conceitos fundamentais de computação gráfica e desenvolvimento de jogos: ciclo principal (\emph{game loop}), transformação de objetos em 3D, iluminação e sombreamento, deteção de colisões e gestão de estado de jogo.
+
+Este projeto consiste na implementação de uma versão \textbf{3D} do \emph{Breakout} usando \ac{OpenGL} (perfil \emph{core} 3.3) em \textbf{C++17}. O objetivo não foi criar um jogo comercial, mas sim construir uma base sólida e compreensível, com um código organizado por módulos e decisões técnicas justificadas.
+
+O trabalho foi desenvolvido em grupo pelos alunos \textbf{António Sobreiro (47933)} e \textbf{Leonardo Ferreira (52981)}. Ao longo do desenvolvimento procurou-se manter uma divisão clara de tarefas, mas sobretudo uma integração contínua: mudanças pequenas e frequentes, com testes manuais imediatos para validar colisões, controlos e estabilidade do \emph{game loop}.
+
+\section{Breve História do \emph{Breakout}}
+\label{sec:hist}
+
+O \emph{Breakout} nasceu na década de 70, numa altura em que os jogos de arcada eram limitados em recursos mas ricos em ideias. O conceito base --- uma bola que ressalta e uma ``barra'' controlada pelo jogador --- foi popularizado pelo \emph{Breakout} da Atari (1976)~\cite{breakoutAtari}. O sucesso do jogo veio muito da simplicidade: regras fáceis de entender em poucos segundos, mas com espaço para melhorar a destreza e a estratégia (por exemplo, abrir ``túneis'' nas paredes de blocos para a bola ficar a limpar a parte de cima).
+
+Com o tempo, surgiram várias releituras do mesmo estilo de jogo (nomeadamente com diferentes tipos de blocos, bónus e níveis), o que o tornou um ponto de partida quase ``clássico'' em cursos de computação gráfica e desenvolvimento de jogos: é pequeno, mas obriga a juntar matemática, renderização e lógica de jogo num sistema coerente.
+
+\section{Motivação}
+\label{sec:mot}
+
+A motivação principal para escolher este projeto foi dupla. Por um lado, é um jogo suficientemente pequeno para ser feito num contexto académico, mas ao mesmo tempo obriga-nos a passar por quase todos os pontos críticos de um \emph{engine} simples: input, atualização por \textit{delta time}, física básica e renderização. Por outro lado, sendo um projeto em 3D, permite aplicar com clareza o pipeline de transformações (modelo, vista e projeção) e perceber melhor a relação entre matemática e o resultado visual.
+
+Além disso, este tipo de jogo é excelente para experimentar afinações (\emph{tuning}): velocidade da bola, sensibilidade do \emph{spin}, tamanhos do mundo, dificuldade e feedback visual (cores, paredes e linha de derrota).
+
+\section{Objetivos}
+\label{sec:obj}
+
+Os objetivos definidos para o projeto foram:
+
+\begin{itemize}
+  \item Implementar um \emph{Breakout} em 3D com ciclo de jogo estável e atualização baseada em \textit{delta time};
+  \item Controlar uma raquete no eixo $x$ com limites laterais e colisão com a bola;
+  \item Gerar e desenhar um conjunto de blocos organizados em grelha, com destruição e pontuação;
+  \item Implementar deteção de colisões entre esfera e \ac{AABB} (blocos/raquete) e resposta simples (reflexão em $x$ ou $y$);
+  \item Renderizar a cena em 3D com iluminação do tipo Phong (ambiente + difusa + especular) em \ac{GLSL};
+  \item Disponibilizar um processo de compilação e execução (Makefile) e documentar decisões, limitações e possíveis melhorias.
+\end{itemize}
+
+\section{Organização do Documento}
+\label{sec:organ}
+
+O relatório encontra-se organizado da seguinte forma:
+
+\begin{enumerate}
+  \item No Capítulo~\ref{chap:intro} apresenta-se o projeto, a motivação e os objetivos.
+  \item No Capítulo~\ref{chap:tec} descrevem-se as tecnologias utilizadas e os conceitos base (pipeline de renderização, matrizes e iluminação).
+  \item No Capítulo~\ref{chap:arquitetura} detalha-se a análise do problema, os requisitos e a arquitetura do sistema (classes, estados e ciclo de jogo).
+  \item No Capítulo~\ref{chap:implementacao} descreve-se a implementação, incluindo os algoritmos principais (geração de geometria, colisões e renderização) e uma bateria de testes práticos.
+  \item Por fim, no Capítulo~\ref{chap:conclusoes} apresentam-se conclusões e trabalho futuro.
+  \item Os Apêndices~A e B incluem um manual de utilização (controlos) e notas de compilação/estrutura do projeto.
+\end{enumerate}

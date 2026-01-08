@@ -1,0 +1,319 @@
+\chapter{Implementação e Testes}
+\label{chap:implementacao}
+
+\section{Introdução}
+\label{chap4:sec:intro}
+
+Este capítulo descreve as principais decisões de implementação, com foco nas partes que, na prática, dão mais trabalho num projeto deste género: (i) criação de geometria e envio para a \ac{GPU}; (ii) shaders e iluminação; (iii) deteção de colisões e resposta; e (iv) testes e afinações.
+
+Sempre que possível, são apresentados excertos de código curtos, retirados do projeto, para ligar a explicação diretamente ao que está a ser executado.
+
+\section{Estrutura do Projeto}
+\label{chap4:sec:estrutura}
+
+A estrutura do projeto é simples e segue uma divisão comum entre interface (\texttt{include/}) e implementação (\texttt{src/}):
+
+\begin{table}[H]
+\centering
+\caption{Estrutura principal do projeto.}
+\label{tab:estrutura}
+\begin{tabular}{p{3.0cm} p{11cm}}
+\hline
+\textbf{Diretório} & \textbf{Conteúdo} \\
+\hline
+\texttt{include/} & cabeçalhos: \texttt{game.h}, \texttt{ball.h}, \texttt{paddle.h}, \texttt{brick.h}, \texttt{renderer.h}, \texttt{shader.h} \\
+\texttt{src/} & implementação das classes anteriores e \texttt{main.cpp} \\
+\texttt{shaders/} & \texttt{vertex.vert} e \texttt{fragment.frag} (\ac{GLSL}) \\
+\texttt{build/} & objetos compilados (\texttt{.o}) \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Documentação do Código (Doxygen)}
+\label{chap4:sec:doxygen}
+
+Para facilitar a leitura e a avaliação do projeto (especialmente quando o código cresce), foi seguida uma convenção de comentários compatível com \emph{Doxygen}~\cite{doxygenManual}. A ideia é simples: descrever, em poucas linhas, o objetivo de cada classe e das funções que têm mais lógica, sem encher o ficheiro de texto.
+
+O excerto seguinte mostra o estilo de documentação usado (o conteúdo é representativo do que foi aplicado no projeto):
+
+\begin{lstlisting}[caption={Exemplo de comentário Doxygen para uma função de colisões.},label={lst:doxygen}]
+/**
+ * @brief Testa colisão esfera--AABB (bola vs bloco).
+ *
+ * Calcula o ponto do bloco mais próximo do centro da bola (clamp) e compara
+ * a distância com o raio. Se houver colisão, aplica uma reflexão em X ou Y.
+ *
+ * @param brick   Bloco a testar.
+ * @return true se existe colisão, false caso contrário.
+ */
+bool Game::checkBallBrickCollision(Brick* brick);
+\end{lstlisting}
+
+Em ambiente de desenvolvimento, a documentação pode ser gerada com um ficheiro \texttt{Doxyfile} (incluído no projeto) e o comando:\\
+\texttt{doxygen Doxyfile}
+
+O resultado é uma página HTML com a descrição das classes, lista de métodos e ligações cruzadas, o que ajuda a navegar o código rapidamente.
+
+\section{Gestão do Projeto}
+\label{chap4:sec:gestao}
+
+Embora o projeto seja relativamente pequeno, optou-se por uma abordagem incremental ("primeiro pôr a renderizar, depois pôr a jogar"). Na prática, isto evitou o erro comum de escrever muita lógica antes de existir um ciclo de renderização estável para testar.
+
+O desenvolvimento foi dividido em etapas curtas, cada uma com um resultado visível e testável:
+
+\begin{table}[H]
+\centering
+\caption{Plano de trabalho (etapas) e objetivo de cada etapa.}
+\label{tab:plano}
+\begin{tabular}{p{3.6cm} p{10.4cm}}
+\hline
+\textbf{Etapa} & \textbf{Objetivo} \\
+\hline
+Setup base & Janela + contexto \ac{OpenGL} 3.3, “game loop” com \texttt{deltaTime} e limpeza de buffers. \\
+Shaders & Carregar/compilar shaders e desenhar um objeto simples para validar o pipeline. \\
+Geometria & Criar cubo (raquete/blocos/parede) e esfera (bola) com \ac{VAO}/\ac{VBO}. \\
+Entidades & Implementar classes \texttt{Ball}, \texttt{Paddle} e \texttt{Brick} e integrá-las em \texttt{Game}. \\
+Colisões & Colisão esfera--AABB (blocos/raquete) + colisões com paredes, score e estados. \\
+Afinações & Ajustes de velocidades, limites do mundo, e “spin” para a jogabilidade ficar controlável. \\
+\hline
+\end{tabular}
+\end{table}
+
+Este tipo de divisão ajudou a isolar problemas: por exemplo, quando algo corria mal nas colisões, já existia renderização e input a funcionar, o que facilitou repetir cenários e comparar.
+
+\section{Descrição do Código (classes e funções)}
+\label{chap4:sec:codigo}
+
+O código foi organizado para que cada classe tenha uma responsabilidade clara. A Tabela~\ref{tab:classes-api} resume a “API” mais relevante de cada módulo.
+
+\begin{table}[H]
+\centering
+\caption{Principais classes e métodos (visão orientada à defesa).}
+\label{tab:classes-api}
+\begin{tabular}{p{2.6cm} p{6.7cm} p{4.7cm}}
+\hline
+\textbf{Classe} & \textbf{Responsabilidade} & \textbf{Métodos-chave} \\
+\hline
+\texttt{Game} & Orquestra o ciclo do jogo, cria entidades, gere estado, score e renderização. & \texttt{init()}, \texttt{processInput(dt)}, \texttt{update(dt)}, \texttt{render()}, \texttt{reset()} \\
+\texttt{Ball} & Estado e movimento da bola (esfera) e pequenas regras (inversões/spin). & \texttt{update(dt)}, \texttt{reverseX/Y()}, \texttt{addSpin()} \\
+\texttt{Paddle} & Movimento controlado da raquete com limites no eixo X. & \texttt{moveLeft()}, \texttt{moveRight()}, \texttt{reset()} \\
+\texttt{Brick} & Representa um bloco e o seu estado (“destroyed”). & \texttt{destroy()}, \texttt{reset()} \\
+\texttt{Renderer} & Cria e guarda geometria em buffers (cubo + esfera). & \texttt{init()}, \texttt{cleanup()}, \texttt{createCube()}, \texttt{createSphere(...)} \\
+\texttt{Shader} & Carregamento/compilação/link de shaders + setters de uniforms. & \texttt{use()}, \texttt{setMat4()}, \texttt{setVec3()}, \texttt{checkCompileErrors()} \\
+\hline
+\end{tabular}
+\end{table}
+
+Para além da estrutura, há dois pontos que são muito úteis de mostrar numa defesa: (i) como é feito o \textbf{mapeamento de teclas} para movimento e reset; e (ii) como se implementam rapidamente os \textbf{limites do mundo} (paredes e fundo).
+
+O processamento de input é feito através de um vetor \texttt{keys[1024]} atualizado por um \emph{callback} do \ac{GLFW}, e consumido por \texttt{Game::processInput(dt)}:
+
+\begin{lstlisting}[caption={Processamento de input e limites laterais da raquete.},label={lst:processInput}]
+void Game::processInput(float dt) {
+    if (state == GAME_ACTIVE) {
+        if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT]) {
+            paddle->moveLeft(dt, -15.0f);
+        }
+        if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT]) {
+            paddle->moveRight(dt, 15.0f);
+        }
+    }
+
+    if (keys[GLFW_KEY_R]) {
+        reset();
+    }
+}
+\end{lstlisting}
+
+Os limites do mundo são tratados de forma direta no \texttt{update(dt)}: ao tocar nas paredes laterais ou no teto, a bola inverte a componente correspondente; ao ultrapassar o fundo (linha de derrota), o estado passa para \texttt{GAME\_LOSE}.
+
+\begin{lstlisting}[caption={Colisões da bola com paredes, teto e fundo (game over).},label={lst:wallCollisions}]
+if (ball->position.x - ball->radius <= -15.0f ||
+    ball->position.x + ball->radius >= 15.0f) {
+    ball->reverseX();
+}
+if (ball->position.y + ball->radius >= 10.0f) {
+    ball->reverseY();
+}
+if (ball->position.y - ball->radius <= -10.0f) {
+    state = GAME_LOSE;
+}
+\end{lstlisting}
+
+\section{Inicialização da Janela e do Contexto OpenGL}
+\label{chap4:sec:init}
+
+A inicialização é feita em \texttt{main.cpp}. Os pontos mais importantes são:
+\begin{itemize}
+  \item criação da janela com \ac{GLFW} e definição da versão \ac{OpenGL} 3.3 core;
+  \item inicialização do \ac{GLEW};
+  \item ativação do teste de profundidade (\texttt{glEnable(GL\_DEPTH\_TEST)}), necessário para objetos 3D.
+\end{itemize}
+
+Para ligar a explicação ao código, o excerto seguinte mostra o coração do \emph{game loop}, com cálculo de \textit{delta time} e chamadas às três fases clássicas: \emph{input} $\rightarrow$ \emph{update} $\rightarrow$ \emph{render}.
+
+\begin{lstlisting}[caption={Excerto do \emph{game loop} em \texttt{main.cpp} com \textit{delta time}.},label={lst:gameloop}]
+while (!glfwWindowShouldClose(window)) {
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
+    breakout->processInput(deltaTime);
+    breakout->update(deltaTime);
+
+    glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    breakout->render();
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+}
+\end{lstlisting}
+
+\section{Renderer: Cubo e Esfera}
+\label{chap4:sec:renderer}
+
+A classe \texttt{Renderer} encapsula a criação de buffers e \ac{VAO} para duas malhas:
+\begin{itemize}
+  \item um \textbf{cubo} (usado para raquete, blocos e paredes);
+  \item uma \textbf{esfera} (usada para a bola).
+\end{itemize}
+
+O cubo é definido por 36 vértices (12 triângulos), cada um com posição e normal. A esfera é gerada de forma paramétrica com \texttt{stacks} e \texttt{sectors} (neste caso, 16 e 32), produzindo triângulos a partir de uma grelha em coordenadas esféricas. Esta abordagem é comum porque é rápida, não exige ficheiros externos e é suficiente para uma bola com sombreamento.
+
+\section{Shaders e Uniforms}
+\label{chap4:sec:shaders}
+
+O shader é carregado a partir de ficheiros (\texttt{shaders/vertex.vert} e \texttt{shaders/fragment.frag}). O programa compila e faz \emph{link} e imprime mensagens de erro caso algo falhe (útil na fase de desenvolvimento).
+
+No \texttt{render()}, a classe \texttt{Game} atualiza sempre os seguintes \emph{uniforms}:
+\begin{itemize}
+  \item matrizes \texttt{model}, \texttt{view}, \texttt{projection};
+  \item posição da luz (\texttt{lightPos});
+  \item posição da câmara (\texttt{viewPos});
+  \item cor do objeto (\texttt{objectColor}).
+\end{itemize}
+
+Isto permite desenhar toda a cena com um único shader, variando apenas o modelo (transformação) e a cor.
+
+\section{Deteção de Colisão: Esfera vs. \ac{AABB}}
+\label{chap4:sec:colisoes}
+
+A colisão mais interessante (e mais ``propensa a bugs'') é entre a bola (esfera) e os blocos (caixas alinhadas aos eixos). A técnica usada é a padrão: calcular o ponto mais próximo da esfera dentro do AABB através de \textbf{clamp} e comparar distâncias.
+
+\begin{lstlisting}[caption={Colisão esfera--AABB (bola vs bloco).},label={lst:sphereAABB}]
+glm::vec3 difference = center - aabb_center;
+glm::vec3 clamped = glm::clamp(difference, -aabb_half, aabb_half);
+glm::vec3 closest = aabb_center + clamped;
+difference = closest - center;
+
+if (glm::length(difference) < ball->radius) {
+    glm::vec3 absD = glm::abs(difference);
+    if (absD.y > absD.x) ball->reverseY();
+    else                 ball->reverseX();
+    return true;
+}
+\end{lstlisting}
+
+A leitura do algoritmo é a seguinte:
+\begin{enumerate}
+  \item passa-se para o referencial do bloco (\texttt{difference});
+  \item limita-se cada componente ao intervalo do AABB (\texttt{clamped});
+  \item obtém-se o ponto do AABB mais próximo do centro da esfera (\texttt{closest});
+  \item se a distância for menor que o raio, existe colisão;
+  \item a resposta é uma reflexão em $x$ ou $y$ consoante a direção dominante da penetração.
+\end{enumerate}
+
+Esta resposta é simples e funciona bem para um \emph{Breakout}. No entanto, é importante notar que ela pode falhar em colisões ``de canto'' muito rápidas (problema conhecido como \emph{tunneling}). No trabalho futuro (Capítulo~\ref{chap:conclusoes}) sugere-se como melhorar este ponto.
+
+\section{Colisão Bola--Raquete e Spin}
+\label{chap4:sec:paddle}
+
+A colisão com a raquete usa uma verificação de sobreposição em X/Y/Z (também uma AABB, mas com a bola como esfera). Existe ainda uma condição adicional: só conta como colisão se a bola estiver a descer (\texttt{velocity.y < 0}), para evitar múltiplas inversões quando a bola já está a subir.
+
+\begin{lstlisting}[caption={Teste de colisão bola--raquete.},label={lst:ballPaddle}]
+return collisionX && collisionY && collisionZ && ball->velocity.y < 0;
+\end{lstlisting}
+
+Quando a colisão acontece, a bola inverte $y$ e a posição é ajustada para ficar acima da raquete (evita que fique ``presa'' dentro do cubo). Depois aplica-se um \textbf{spin} baseado no ponto de contacto:
+
+\begin{lstlisting}[caption={Spin: influencia horizontal em função do ponto de contacto.},label={lst:spin}]
+float hitPos = (ball->position.x - paddle->position.x) / (paddle->size.x / 2.0f);
+ball->addSpin(hitPos * 0.02f);
+\end{lstlisting}
+
+Na bola, o spin é escalado e limitado para manter o jogo controlável:
+
+\begin{lstlisting}[caption={Aplicação e limite do spin na bola.},label={lst:spinBall}]
+velocity.x += spin * 10.0f;
+if (velocity.x > 12.0f)  velocity.x = 12.0f;
+if (velocity.x < -12.0f) velocity.x = -12.0f;
+\end{lstlisting}
+
+Esta combinação dá ao jogador alguma influência sobre a trajetória sem tornar a bola ``imprevisível''.
+
+\section{Renderização da Cena}
+\label{chap4:sec:render}
+
+A cena é desenhada sempre na mesma ordem:
+\begin{enumerate}
+  \item raquete (cubo escalado);
+  \item bola (esfera escalada ao raio);
+  \item blocos (cubos escalados ao tamanho do bloco);
+  \item paredes laterais, teto e linha inferior (cubos finos/largos).
+\end{enumerate}
+
+Para as paredes, o mesmo VAO do cubo é reutilizado e apenas se altera a matriz \texttt{model}. A ``linha de perigo'' inferior é desenhada a vermelho, o que ajuda a dar feedback imediato ao jogador sobre onde perde o jogo.
+
+
+\section{Aspeto Visual e Captura de Ecrã}
+\label{chap4:sec:screenshot}
+
+A Figura~\ref{fig:screenshot} apresenta uma captura de ecrã do jogo em execução. 
+Esta imagem é útil para contextualizar rapidamente o resultado final: grelha de blocos por linhas de cor, 
+raquete na zona inferior e bola com sombreamento, já com iluminação ativa e teste de profundidade.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{Breakout.png}
+  \caption{Captura de ecrã do \emph{3D Breakout} em execução.}
+  \label{fig:screenshot}
+\end{figure}
+
+
+\section{Testes Realizados}
+\label{chap4:sec:testes}
+
+Não foi criada uma suite automática, pelo que os testes foram maioritariamente manuais e focados em cenários que normalmente geram problemas em jogos de colisões simples. A Tabela~\ref{tab:testes} resume os cenários testados.
+
+\begin{table}[H]
+\centering
+\caption{Testes práticos realizados.}
+\label{tab:testes}
+\begin{tabular}{p{4.2cm} p{6.2cm} p{3.6cm}}
+\hline
+\textbf{Cenário} & \textbf{O que se valida} & \textbf{Resultado} \\
+\hline
+Colisão com paredes ($x=\pm 15$) & inversão correta de $v_x$ sem atravessar a parede & OK \\
+Colisão com teto ($y=10$) & inversão de $v_y$ e continuidade do movimento & OK \\
+Colisão com raquete & inversão apenas quando bola desce + reposicionamento & OK \\
+Spin na raquete & variação de $v_x$ conforme ponto de contacto & OK \\
+Colisão com bloco (centro) & destruição do bloco + pontuação + inversão coerente & OK \\
+Colisão com bloco (canto) & avaliar reflexões em $x$ vs $y$ & Aceitável \\
+Derrota ($y\le -10$) & transição para \texttt{GAME\_LOSE} + mensagem & OK \\
+Vitória & quando todos os blocos destruídos & OK \\
+Reset (tecla R) & reposicionar objetos e restaurar blocos/pontos & OK\footnotemark \\
+\hline
+\end{tabular}
+\end{table}
+\footnotetext{No \textit{reset}, a velocidade definida no código (\texttt{(0.05, 0.05, 0)}) é muito baixa e pode dar a sensação de ``bola parada''. Uma melhoria simples é restaurar a velocidade inicial usada na inicialização.}
+
+\section{Observações de Desempenho}
+\label{chap4:sec:perf}
+
+O custo por frame é baixo: existem poucas \emph{draw calls} (raquete + bola + até 50 blocos + paredes) e a geometria é simples. A esfera é a malha mais pesada, mas continua dentro de valores confortáveis para hardware atual. Como a atualização física é básica (operações vetoriais e poucas comparações), o gargalo do projeto tende a ser a renderização e não a lógica.
+
+\section{Conclusões}
+\label{chap4:sec:concs}
+
+A implementação cumpre o objetivo do projeto: jogo funcional, com colisões estáveis, iluminação e uma estrutura clara. Ao mesmo tempo, ficaram identificados pontos de melhoria realistas (por exemplo, corrigir a velocidade do reset e refinar colisões em cantos rápidos), discutidos no Capítulo~\ref{chap:conclusoes}.

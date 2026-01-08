@@ -1,0 +1,12 @@
+digraph Loop {
+  graph [rankdir=LR, nodesep=0.6, ranksep=0.8, bgcolor="white"];
+  node  [shape=box, style="rounded", fontname="Helvetica", fontsize=18, penwidth=2];
+  edge  [penwidth=2, arrowsize=1.0];
+
+  Input    [label="Input\n(GLFW callbacks)\nkeys[]"];
+  UpdateDT [label="Update\n(deltaTime)"]; 
+  Physics  [label="Colisões\n(paredes, raquete, blocos)\nscore + state"]; 
+  Render   [label="Render\n(OpenGL draw calls)"]; 
+
+  Input -> UpdateDT -> Physics -> Render;
+}

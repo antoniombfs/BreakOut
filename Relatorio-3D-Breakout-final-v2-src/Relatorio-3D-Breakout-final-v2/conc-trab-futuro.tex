@@ -1,0 +1,48 @@
+\chapter{Conclusões e Trabalho Futuro}
+\label{chap:conclusoes}
+
+\section{Conclusões}
+\label{sec:conc}
+
+O projeto \emph{3D Breakout} atingiu os objetivos propostos: existe um jogo jogável em 3D, com controlo responsivo da raquete, colisões com paredes/raquete/blocos, pontuação e deteção de vitória/derrota. Do ponto de vista de computação gráfica, a aplicação utiliza um pipeline moderno de \ac{OpenGL} com shaders em \ac{GLSL}, suportado por \ac{GLFW}, \ac{GLEW} e \ac{GLM}.
+
+Um aspeto que considero particularmente positivo é a separação de responsabilidades: 
+\begin{itemize}
+  \item \texttt{Game} funciona como ponto central do estado e da lógica;
+  \item \texttt{Renderer} trata da geometria e buffers;
+  \item \texttt{Shader} encapsula carregamento/compilação e \emph{uniforms};
+  \item \texttt{Ball}, \texttt{Paddle} e \texttt{Brick} mantêm o modelo de dados simples e fácil de testar.
+\end{itemize}
+
+Ao longo do desenvolvimento, o maior esforço esteve na parte das colisões e na ``sensação'' do jogo (velocidades e spin). Mesmo com uma física simplificada, pequenos detalhes (como reposicionar a bola após colisão com a raquete) têm impacto direto na estabilidade e no controlo.
+
+\section{Limitações Identificadas}
+\label{sec:limit}
+
+As principais limitações são:
+
+\begin{itemize}
+  \item \textbf{Resposta de colisão simplificada}: a bola apenas reflete em $x$ ou $y$ consoante a componente dominante, o que pode gerar casos pouco realistas em cantos.
+  \item \textbf{Possível \emph{tunneling}}: com velocidades mais altas, a bola pode atravessar um bloco entre frames. Este é um problema comum quando se usa deteção discreta (por frame) em vez de contínua.
+  \item \textbf{Reset com velocidade muito baixa}: no código atual, o reset define a velocidade para \texttt{(0.05, 0.05, 0)}, o que pode tornar o reinício pouco dinâmico sem nova afinação.
+  \item \textbf{Ausência de HUD}: a pontuação e estado são impressos na consola; não existe renderização de texto na janela.
+\end{itemize}
+
+\section{Trabalho Futuro}
+\label{sec:fut}
+
+Existem várias extensões possíveis que melhorariam tanto a qualidade do jogo como o valor técnico do projeto:
+
+\begin{enumerate}
+  \item \textbf{HUD e menus}: renderização de texto (por exemplo, com uma biblioteca de \emph{font rendering}) para mostrar pontuação, estado e instruções no ecrã, e implementação real do estado \texttt{GAME\_MENU}.
+  \item \textbf{Vidas e níveis}: introduzir vidas, aumentar progressivamente a dificuldade e criar múltiplos níveis (várias grelhas de blocos).
+  \item \textbf{Melhorias de física}: normalizar velocidade da bola, introduzir aceleração gradual e melhorar a resposta de colisão para considerar o vetor normal de impacto de forma mais robusta.
+  \item \textbf{Colisão contínua}: implementar \emph{swept sphere} contra AABB para reduzir \emph{tunneling} e tornar o comportamento mais consistente a altas velocidades.
+  \item \textbf{Texturas e materiais}: adicionar texturas ou diferentes materiais para distinguir bola/raquete/blocos e enriquecer o aspeto visual.
+  \item \textbf{Som}: efeitos sonoros em colisões e vitória/derrota para aumentar o feedback ao jogador.
+\end{enumerate}
+
+\section{Consideração Final}
+\label{sec:final}
+
+Mesmo sendo um projeto relativamente curto, o desenvolvimento ajudou a consolidar os conceitos mais relevantes de computação gráfica em tempo real. Em particular, ficou claro que a parte ``gráfica'' (shaders e matrizes) e a parte ``de jogo'' (colisões e afinação) estão sempre ligadas: um pequeno erro num vetor ou num limite do mundo traduz-se imediatamente em comportamento estranho no ecrã. É precisamente este ciclo rápido de testar/ajustar que torna este tipo de projeto tão útil num contexto académico.

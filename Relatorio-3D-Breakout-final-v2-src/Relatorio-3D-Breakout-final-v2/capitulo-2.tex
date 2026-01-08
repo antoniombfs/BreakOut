@@ -1,0 +1,87 @@
+\chapter{Tecnologias e Conceitos Base}
+\label{chap:tec}
+
+\section{Introdução}
+\label{chap2:sec:intro}
+
+Este capítulo descreve as tecnologias e bibliotecas utilizadas no projeto, bem como os conceitos que suportam as decisões tomadas ao longo do desenvolvimento. Apesar de ser um jogo relativamente simples, ele usa a ``cadeia completa'' de uma aplicação gráfica em tempo real: criação de janela e contexto \ac{OpenGL}, compilação de shaders, gestão de buffers, câmaras e transformações, e um modelo básico de iluminação.
+
+\section{Linguagem e Ambiente}
+\label{chap2:sec:ambiente}
+
+O projeto foi desenvolvido em \textbf{C++17}, com foco num código curto e direto, mas sem misturar responsabilidades. A estrutura do projeto segue uma organização típica por diretórios (\texttt{src/}, \texttt{include/}, \texttt{shaders/}) e o processo de build é suportado por um \texttt{Makefile} (ver Apêndice~B).
+
+Apesar de o \texttt{Makefile} estar configurado com bibliotecas de \textbf{Windows} (por exemplo, \texttt{-lopengl32}), o código é suficientemente portátil para que, com pequenas alterações nos \textit{flags} de ligação, possa ser compilado em Linux/macOS.
+
+\section{\ac{OpenGL} 3.3 e Pipeline de Renderização}
+\label{chap2:sec:opengl}
+
+O \ac{OpenGL} é uma \ac{API} de renderização em tempo real onde o programador controla explicitamente o envio de dados para a \ac{GPU} e o modo como a geometria é processada. Neste projeto é usado o perfil \emph{core} 3.3, o que implica que toda a geometria é desenhada através de \ac{VAO} e \ac{VBO}, e que o pipeline programável é definido em \ac{GLSL} (vertex e fragment shaders)~\cite{openglSpec,glslSpec}.
+
+O fluxo típico por frame é:
+\begin{enumerate}
+  \item Ativar o shader (programa);
+  \item Atualizar \emph{uniforms} (matrizes, luz, cor do objeto);
+  \item Selecionar o \ac{VAO} correspondente (cubo ou esfera);
+  \item Chamar \texttt{glDrawArrays} para desenhar.
+\end{enumerate}
+
+\section{GLFW, GLEW e GLM}
+\label{chap2:sec:bibs}
+
+Foram usadas três bibliotecas essenciais:
+
+\begin{itemize}
+  \item \textbf{\ac{GLFW}}: criação de janela, contexto \ac{OpenGL} e captura de eventos de teclado. Permite também gerir o \emph{swap} de buffers e o \emph{polling} de eventos~\cite{glfw}.
+  \item \textbf{\ac{GLEW}}: carregamento de extensões e funções \ac{OpenGL}, necessário em muitos ambientes para aceder à \ac{API} moderna~\cite{glew}.
+  \item \textbf{\ac{GLM}}: biblioteca de matemática que replica a sintaxe do GLSL (vetores e matrizes) e simplifica operações como \texttt{lookAt} e \texttt{perspective}~\cite{glm}.
+\end{itemize}
+
+\section{Transformações e Câmara (Model--View--Projection)}
+\label{chap2:sec:mvp}
+
+A renderização 3D baseia-se no uso de três matrizes principais:
+
+\begin{itemize}
+  \item \textbf{Model}: posiciona e escala cada objeto no mundo;
+  \item \textbf{View}: representa a câmara (onde estamos e para onde olhamos);
+  \item \textbf{Projection}: define a perspetiva (ângulo de visão e plano de corte).
+\end{itemize}
+
+No projeto, a câmara é fixa, posicionada em:
+\[
+\texttt{cameraPos} = (0, 0, 25)
+\]
+e a projeção é perspetiva com campo de visão de $45^\circ$ e planos $0.1$ e $100.0$:
+
+\begin{lstlisting}[caption={Configuração da câmara e projeção.},label={lst:camera}]
+view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+projection = glm::perspective(glm::radians(45.0f),
+                             (float)width/(float)height,
+                             0.1f, 100.0f);
+\end{lstlisting}
+
+Esta opção dá um efeito de profundidade suficiente para perceber o jogo como 3D, mas sem complicar com uma câmara móvel (o que, neste tipo de jogo, raramente é essencial).
+
+\section{Iluminação de Phong em \ac{GLSL}}
+\label{chap2:sec:phong}
+
+Para evitar um aspeto ``plano'', foi implementada uma iluminação do tipo Phong no \emph{fragment shader}. O modelo soma três componentes:
+\begin{enumerate}
+  \item \textbf{Ambiente}: iluminação constante (neste caso, $0.3$);
+  \item \textbf{Difusa}: depende do ângulo entre a normal e a direção da luz;
+  \item \textbf{Especular}: simula brilhos, dependente da posição do observador (expoente 32).
+\end{enumerate}
+
+O shader calcula o resultado final como:
+\[
+(\text{ambiente} + \text{difusa} + \text{especular}) \cdot \text{objectColor}
+\]
+o que permite reutilizar o mesmo shader para bola, raquete, blocos e paredes, variando apenas a cor do objeto.
+
+Este modelo de iluminação é um dos mais usados em renderização em tempo real por ser simples, eficiente e suficientemente expressivo para objetos com materiais ``genéricos'' (plástico/metal), sendo descrito em manuais e referências comuns da área~\cite{realtimeRendering,learnopengl}.
+
+\section{Conclusões}
+\label{chap2:sec:concs}
+
+As tecnologias escolhidas são adequadas ao objetivo do projeto: o par \ac{GLFW}+\ac{GLEW} resolve a parte de janela/contexto, o \ac{OpenGL} fornece um pipeline moderno e explícito, e o \ac{GLM} evita erros comuns de matemática. No capítulo seguinte (Capítulo~\ref{chap:arquitetura}) passamos da base tecnológica para a estrutura do jogo: requisitos, classes e o ciclo principal.

@@ -1,0 +1,18 @@
+digraph G {
+  graph [layout=neato, overlap=false, splines=true, bgcolor="white"];
+  node  [shape=box, style="rounded", fontname="Helvetica", fontsize=16, penwidth=2];
+  edge  [penwidth=2, arrowsize=0.9];
+
+  Game     [pos="0,2!",  label="Game\n(state, keys[], score)\ninit / processInput / update / render"]; 
+  Ball     [pos="-4,0!", label="Ball\n(position, velocity, radius)\nupdate / reset / reverseX,Y / addSpin"]; 
+  Paddle   [pos="0,0!",  label="Paddle\n(position, size, speed)\nmoveLeft / moveRight / reset"]; 
+  Brick    [pos="4,0!",  label="Brick\n(position, size, color, destroyed)\ndestroy / reset"]; 
+  Renderer [pos="-2,-2!", label="Renderer\n(VAO/VBO)\ncreateCube / createSphere"]; 
+  Shader   [pos="2,-2!",  label="Shader\n(load / compile / link)\nsetUniforms()"]; 
+
+  Game -> Ball;
+  Game -> Paddle;
+  Game -> Brick;
+  Game -> Renderer;
+  Game -> Shader;
+}

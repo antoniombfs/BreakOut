@@ -1,0 +1,12 @@
+# Doxygen configuration (minimal) for 3D-Breakout
+PROJECT_NAME           = "3D-Breakout"
+OUTPUT_DIRECTORY       = docs
+INPUT                  = include src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.cpp
+EXTRACT_ALL            = YES
+HIDE_UNDOC_MEMBERS     = YES
+HIDE_UNDOC_CLASSES     = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+QUIET                  = YES
